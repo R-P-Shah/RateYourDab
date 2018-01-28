@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" type="text/css" href="styles.css"/>
+
 </head>
 <body onload="init();">
-  <h1>DAB ON EM</h1>
-
+  <h1>Rate Your Dab</h1>
   <div>
-  Click on the Start Recording button.
-
+  Click on the Start Recording button and hit that DAB!
+  (it's probably best to not do this one alone)
+  -regards, @kshup and @ilikefuud
   <p>
     <button onclick="startWebcam();">Start Recording</button>
     <button onclick="stopWebcam();">Stop Recording</button>
@@ -19,15 +21,19 @@
       <canvas  id="myCanvas" width="800" height="600"></canvas>
       <ul id = "coords"> <ul>
         <button onclick="calculateAngles(); drawDabData();"> Rate My Dab!</button>
-
-        <ol id="">
-          <li>*</li>
-          <li>*</li>
-          <li>*</li>
+        <ol>
+          <li id="angle1">*</li>
+          <li id="angle2">*</li>
+          <li id="angle3">*</li>
         </ol>
-      </body>
-      <script>
 
+        <h1 id="dabGrade">YOUR DAB SCORE IS: </h1>
+
+      </body>
+<footer>
+  Developed by Kashyap Garimella and Rahul Shah
+</footer>
+      <script>
       //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -89,15 +95,36 @@
 
           drawDabData(arm_shoulder_right, elbow_hip_right, hip_elbow_left);
 
+          document.getElementById("angle1").innerText = arm_shoulder_right;
+          document.getElementById("angle2").innerText = elbow_hip_right;
+          document.getElementById("angle3").innerText = hip_elbow_left;
+
+
           console.log(arm_shoulder_right + "," + elbow_hip_right + "," + hip_elbow_left);
+
+          gradeDabs(arm_shoulder_right, elbow_hip_right, hip_elbow_left);
         }
 
-        function gradeDabs(){
+        //Function that calculates the average percent difference between optimal angle and user angle
+        function gradeDabs(angle1, angle2, angle3){
 
+          //define medians
+          var perfectAngle1 = 39.97;
+          var perfectAngle2 =  133.93;
+          var perfectAngle3 =  -116.37;
+
+          //calculate differences
+          var angle1Diff = Math.abs(perfectAngle1 - angle1)/perfectAngle1;
+          var angle2Diff = Math.abs(perfectAngle2 - angle2)/perfectAngle2;
+          var angle3Diff = Math.abs(perfectAngle3 - angle3)/perfectAngle3;
+
+          var grade = (1 - ((angle1Diff + angle2Diff + angle3Diff)/3)) * 100;
+          document.getElementById("dabGrade").innerText = "Your Dab Score is: " + grade + "%";
+          console.log("SCORE:"+grade);
 
         }
 
-        //Initiates the webcam recording
+        //Function that Initiates the webcam recording
         function startWebcam() {
           if (navigator.getUserMedia) {
             navigator.getUserMedia (
@@ -175,18 +202,18 @@
           {
             console.log(i,":",coordStack[i]);
           }
+
           ctx.strokeStyle = "red";
           ctx.lineWidth = 5;
           ctx.beginPath();
           ctx.moveTo(coordStack[0],coordStack[1]);
+
           for(var i = 0; i < 3 ; i++)
           {
             ctx.lineTo(coordStack[i * 2],coordStack[i * 2 + 1]);
 
             ctx.strokeStyle = "red";
-
           }
-
 
           ctx.strokeStyle = "red";
           ctx.stroke();
@@ -238,6 +265,7 @@
           csvData += "100";
           console.log(csvData);
         }
+
         </script>
 
 </html>
