@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body onload="init();">
+  <h1>DAB ON EM</h1>
+  Click on the Start WebCam button.
+  <span>
+
+  <p>
+    <button onclick="startWebcam();">Start WebCam</button>
+    <button onclick="stopWebcam();">Stop WebCam</button>
+    <button onclick="snapshot();">Take Snapshot</button>
+    <button onclick="drawDabData();">Draw Dab Data</button>
+  </p>
+  <video onclick="snapshot(this);" width=800 height=800 id="video" controls autoplay></video>
+  <p>
+
+    Pictures : <p>
+      <canvas  id="myCanvas" width="800" height="600"></canvas>
+
+      <ul id = "coords"> <ul>
+        <button onclick="calculateAngles();"> Rate My Dab!</button>
+      <button onclick="exportData();"> export</button>
+      </body>
+      <script>
+      //--------------------
+      // GET USER MEDIA CODE
+      //--------------------
+      navigator.getUserMedia = ( navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
+
+        var video;
+        var webcamStream;
+
+        function getMouse(e) {
+          var mouse = {}
+          mouse.x = e.pageX - e.target.offsetLeft;
+          mouse.y = e.pageY - e.target.offsetTop;
+          return mouse;
+        }
+
+        function calculateAngles(){
+          //body part coordinates
+          //to be used when making calculateAngles
+
+
+          var wristRightX = coordStack[0];
+          var wristRightY = coordStack[1];
+
+          var elbowRightX = coordStack[2];
+          var elbowRightY = coordStack[3];
+
+          var shoulderRightX = coordStack[4];
+          var shoulderRightY = coordStack[5];
+
+          var hipRightX = coordStack[6];
+          var hipRightY = coordStack[7];
+
+          var hipLeftX = coordStack[8];
+          var hipLeftY = coordStack[9];
+
+          var shoulderLeftX = coordStack[10];
+          var shoulderLeftY = coordStack[11];
+
+          var wristLeftX = coordStack[12];
+          var wristLeftY = coordStack[13];
+
+
+          console.log(wristRightX + "," + wristRightY);
+          console.log(elbowRightX + "," + elbowRightY);
+          console.log(shoulderRightX + "," + shoulderRightY);
+          console.log(hipRightX + "," + hipRightY);
+          console.log(hipLeftX + "," + hipLeftY);
+          console.log(shoulderLeftX + "," + shoulderLeftY);
+          console.log(wristLeftX + "," + wristLeftY);
+
+          //calculate
+          //var arm-shoulder-right = Math.acos(wristRightY - elbowRightY, wristRightX - elbowRightX);
+          //console.log(arm-shoulder-right);
+
+          var arm-shoulder-right =(Math.atan2(elbowRightY - wristRightY, elbowRightX - wristRightX) * 180)/ Math.PI;
+          var elbow-hip-right =(Math.atan2(hipRightY - elbowRightY, hipRightX - elbowRightX) * 180)/ Math.PI;
+          var hip-elbow-left =(Math.atan2(wristLeftY - hipLeftY, wristLeftX - hipLeftX) * 180)/ Math.PI;
+
+
+          console.log(arm-shoulder-right + "," + elbow-hip-right + "," + hip-elbow-left);
+
+        }
+
+        function startWebcam() {
+          if (navigator.getUserMedia) {
+            navigator.getUserMedia (
+
+
+
+              // constraints
+              {
+                video: true,
+                audio: false
+              },
+
+              // successCallback
+              function(localMediaStream) {
+                video = document.querySelector('video');
+                video.src = window.URL.createObjectURL(localMediaStream);
+                webcamStream = localMediaStream;
+              },
+
+              // errorCallback
+              function(err) {
+                console.log("The following error occured: " + err);
+              }
+            );
+          } else {
+            console.log("getUserMedia not supported");
+          }
+        }
+
+        function stopWebcam() {
+          webcamStream.stop();
+        }
+        //---------------------
+        // TAKE A SNAPSHOT CODE
+        //---------------------
+        let canvas, ctx;
+
+        let coordStack = [];
+
+        function init() {
+          // Get the canvas and obtain a context for
+          // drawing in it
+          canvas = document.getElementById("myCanvas");
+          ctx = canvas.getContext('2d');
+
+          canvas.addEventListener("click", handleCoords);
+        }
+
+        function drawCircle(x, y, ctx, color, circleRadius) {
+
+          ctx.beginPath()
+          ctx.fillStyle = color;
+          ctx.arc(x, y, circleRadius, 0, 2 * Math.PI, false);
+
+          ctx.fill();
+          ctx.closePath();
+        }
+
+        function handleCoords(e){
+          const {x,y} = getMouse(e);
+
+          drawCircle(x,y, ctx, 'red', 5);
+
+          coordStack.push(x,y);
+
+          const el = document.createElement('li');
+
+          el.innerHTML = `X: ${x} - Y: ${y}`;
+
+          document.getElementById("coords").appendChild(el);
+
+          //console.log(coordStack);
+
+          for(var i = 0; i < coordStack.length; i++)
+          {
+            console.log(i,":",coordStack[i]);
+          }
+        }
+
+        function drawDabData(){
+          for(var i = 0; i < coordStack.length; i++)
+          {
+            console.log(i,":",coordStack[i]);
+          }
+          ctx.beginPath();
+          ctx.moveTo(coordStack[0],coordStack[1]);
+          for(var i = 0; i < 3 ; i++)
+          {
+            ctx.lineTo(coordStack[i * 2],coordStack[i * 2 + 1]);
+          }
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(coordStack[6],coordStack[7]);
+          for(var i = 3; i < 7 ; i++)
+          {
+            ctx.lineTo(coordStack[i * 2],coordStack[i * 2 + 1]);
+          }
+          ctx.stroke();
+        }
+
+
+        function snapshot() {
+          // Draws current image from the video element into the canvas
+          ctx.drawImage(video, 0,0, canvas.width, canvas.height);
+        }
+
+        // function sendCoords(){
+        //   var url = '';
+        //   fetch(url, {
+        //     method: 'POST', // or 'PUT'
+        //     body: JSON.stringify({coordStack}),
+        //     headers: new Headers({
+        //       'Content-Type': 'application/json'
+        //     })
+        //   }).then(res => res.json())
+        //   .catch(error => console.error('Error:', error))
+        //   .then(response => console.log('Success:', response));
+        // }
+
+        function exportData(){
+          var csvData = "";
+          for(var i = 0; i < coordStack.length; i++) {
+            csvData += coordStack[i];
+            csvData += ",";
+          }
+          csvData += "100";
+          console.log(csvData);
+        }
+
+
+        </script>
+
+      </body>
+</html>
