@@ -7,8 +7,8 @@
 <body onload="init();">
   <h1>Rate Your Dab</h1>
   <div>
-  Click on the Start Recording button and hit that DAB!
-  (it's probably best to not do this one alone)
+  <p>Click on the Start Recording button and hit that DAB!<\p>
+  <p>(it's probably best to not do this one alone)<\p>
   -regards, @kshup and @ilikefuud
   <p>
     <button onclick="startWebcam();">Start Recording</button>
@@ -37,10 +37,10 @@
       //--------------------
       // GET USER MEDIA CODE
       //--------------------
-      navigator.getUserMedia = ( navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia);
+        navigator.getUserMedia = ( navigator.getUserMedia ||
+          navigator.webkitGetUserMedia ||
+          navigator.mozGetUserMedia ||
+          navigator.msGetUserMedia);
 
         var video;
         var webcamStream;
@@ -185,8 +185,10 @@
           drawCircle(x,y, ctx, 'red', 5);
           coordStack.push(x,y);
           const el = document.createElement('li');
-          el.innerHTML = `X: ${x} - Y: ${y}`;
-          document.getElementById("coords").appendChild(el);
+          
+          //for debugging
+          //el.innerHTML = `X: ${x} - Y: ${y}`;
+          //document.getElementById("coords").appendChild(el);
 
           //console.log(coordStack);
           for(var i = 0; i < coordStack.length; i++)
@@ -223,9 +225,7 @@
           {
             ctx.lineTo(coordStack[i * 2],coordStack[i * 2 + 1]);
           }
-
-
-
+          
           ctx.strokeStyle = "red";
           ctx.stroke();
 
